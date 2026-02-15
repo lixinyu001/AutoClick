@@ -4,11 +4,14 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -36,6 +39,10 @@ public class MainActivity extends AppCompatActivity {
     private EditText intervalEdit;
     private List<AutoClickService.ClickPoint> clickPoints = new ArrayList<>();
     private int pointCounter = 0;
+    
+    // 临时存储获取的坐标
+    private float lastX = 0;
+    private float lastY = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +98,17 @@ public class MainActivity extends AppCompatActivity {
         addPointParams.setMargins(0, 0, 0, margin / 2);
         addPointBtn.setOnClickListener(v -> addClickPoint());
         mainLayout.addView(addPointBtn, addPointParams);
+        
+        // 获取坐标按钮
+        Button getCoordBtn = new Button(this);
+        getCoordBtn.setText("获取坐标");
+        LinearLayout.LayoutParams getCoordParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            buttonHeight
+        );
+        getCoordParams.setMargins(0, 0, 0, margin / 2);
+        getCoordBtn.setOnClickListener(v -> startCoordinatePicker());
+        mainLayout.addView(getCoordBtn, getCoordParams);
         
         // 开始按钮
         Button startBtn = new Button(this);
@@ -420,5 +438,116 @@ public class MainActivity extends AppCompatActivity {
     private void openScriptEditor() {
         Intent intent = new Intent(this, ScriptEditorActivity.class);
         startActivity(intent);
+    }
+    
+    private void startCoordinatePicker() {
+        Toast.makeText(this, "点击屏幕任意位置获取坐标", Toast.LENGTH_LONG).show();
+        
+        // 创建一个透明的覆盖层来捕获点击
+        View overlayView = new View(this);
+        overlayView.setBackgroundColor(0x80000000);
+        
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+            PixelFormat.TRANSLUCENT
+        );
+        
+        WindowManager windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        windowManager.addView(overlayView, params);
+        
+        overlayView.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                lastX = event.getX();
+                lastY = event.getY();
+                
+                windowManager.removeView(overlayView);
+                
+                // 自动添加点击点并填入坐标
+                addClickPointWithCoordinate(lastX, lastY);
+                
+                Toast.makeText(this, "已获取坐标: X=" + (int)lastX + ", Y=" + (int)lastY, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+            return false;
+        });
+    }
+    
+    private void addClickPointWithCoordinate(float x, float y) {
+        pointCounter++;
+        
+        // 获取屏幕尺寸
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;
+        int screenHeight = getResources().getDisplayMetrics().heightPixels;
+        
+        LinearLayout pointLayout = new LinearLayout(this);
+        pointLayout.setOrientation(LinearLayout.HORIZONTAL);
+        // 设置padding为屏幕宽度的1%
+        int padding = (int) (screenWidth * 0.01);
+        pointLayout.setPadding(padding, padding, padding, padding);
+        
+        // X坐标
+        TextView xLabel = new TextView(this);
+        xLabel.setText("X:");
+        // 标签字体大小为屏幕宽度的2.5%
+        xLabel.setTextSize(screenWidth * 0.025f);
+        pointLayout.addView(xLabel);
+        
+        EditText xEdit = new EditText(this);
+        xEdit.setText(String.valueOf((int)x));
+        // X编辑框宽度为屏幕宽度的15%
+        int editWidth = (int) (screenWidth * 0.15);
+        xEdit.setWidth(editWidth);
+        pointLayout.addView(xEdit);
+        
+        // Y坐标
+        TextView yLabel = new TextView(this);
+        yLabel.setText("Y:");
+        // 标签字体大小为屏幕宽度的2.5%
+        yLabel.setTextSize(screenWidth * 0.025f);
+        pointLayout.addView(yLabel);
+        
+        EditText yEdit = new EditText(this);
+        yEdit.setText(String.valueOf((int)y));
+        // Y编辑框宽度为屏幕宽度的15%
+        yEdit.setWidth(editWidth);
+        pointLayout.addView(yEdit);
+        
+        // 描述
+        TextView descLabel = new TextView(this);
+        descLabel.setText("描述:");
+        // 标签字体大小为屏幕宽度的2.5%
+        descLabel.setTextSize(screenWidth * 0.025f);
+        pointLayout.addView(descLabel);
+        
+        EditText descEdit = new EditText(this);
+        descEdit.setText("点击点" + pointCounter);
+        // 描述编辑框宽度为屏幕宽度的30%
+        int descWidth = (int) (screenWidth * 0.3);
+        descEdit.setWidth(descWidth);
+        pointLayout.addView(descEdit);
+        
+        // 删除按钮
+        Button deleteBtn = new Button(this);
+        deleteBtn.setText("删除");
+        // 删除按钮宽度为屏幕宽度的12%
+        int deleteWidth = (int) (screenWidth * 0.12);
+        // 删除按钮高度为屏幕高度的4%
+        int deleteHeight = (int) (screenHeight * 0.04);
+        LinearLayout.LayoutParams deleteParams = new LinearLayout.LayoutParams(
+            deleteWidth,
+            deleteHeight
+        );
+        deleteParams.setMargins((int)(screenWidth * 0.01), 0, 0, 0);
+        deleteBtn.setLayoutParams(deleteParams);
+        deleteBtn.setOnClickListener(v -> {
+            clickPointsLayout.removeView(pointLayout);
+            updateClickPointsList();
+        });
+        pointLayout.addView(deleteBtn);
+        
+        clickPointsLayout.addView(pointLayout);
     }
 }
