@@ -49,16 +49,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void createLayout() {
+        // 获取屏幕尺寸
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;
+        int screenHeight = getResources().getDisplayMetrics().heightPixels;
+        
         // 主布局
         LinearLayout mainLayout = new LinearLayout(this);
         mainLayout.setOrientation(LinearLayout.VERTICAL);
-        mainLayout.setPadding(20, 20, 20, 20);
+        // 设置主布局padding为屏幕宽度的2%
+        int padding = (int) (screenWidth * 0.02);
+        mainLayout.setPadding(padding, padding, padding, padding);
         
         // 标题
         TextView titleText = new TextView(this);
         titleText.setText("自动点击器");
-        titleText.setTextSize(24);
-        titleText.setPadding(0, 0, 0, 20);
+        // 标题字体大小为屏幕宽度的5%
+        titleText.setTextSize(screenWidth * 0.05f);
+        // 标题padding为屏幕高度的1%
+        int titlePadding = (int) (screenHeight * 0.01);
+        titleText.setPadding(0, 0, 0, titlePadding);
         LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
@@ -68,11 +77,15 @@ public class MainActivity extends AppCompatActivity {
         // 添加点击点按钮
         Button addPointBtn = new Button(this);
         addPointBtn.setText("添加点击点");
+        // 按钮高度为屏幕高度的6%
+        int buttonHeight = (int) (screenHeight * 0.06);
         LinearLayout.LayoutParams addPointParams = new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+            buttonHeight
         );
-        addPointParams.setMargins(0, 0, 0, 10);
+        // 边距为屏幕高度的0.5%
+        int margin = (int) (screenHeight * 0.005);
+        addPointParams.setMargins(0, 0, 0, margin);
         addPointBtn.setOnClickListener(v -> addClickPoint());
         mainLayout.addView(addPointBtn, addPointParams);
         
@@ -81,16 +94,20 @@ public class MainActivity extends AppCompatActivity {
         clickPointsLayout = new LinearLayout(this);
         clickPointsLayout.setOrientation(LinearLayout.VERTICAL);
         scrollView.addView(clickPointsLayout);
+        // 设置ScrollView高度为屏幕高度的25%
+        int scrollHeight = (int) (screenHeight * 0.25);
         LinearLayout.LayoutParams scrollParams = new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
-            400
+            scrollHeight
         );
-        scrollParams.setMargins(0, 0, 0, 10);
+        scrollParams.setMargins(0, 0, 0, margin);
         mainLayout.addView(scrollView, scrollParams);
         
         // 重复次数
         TextView repeatLabel = new TextView(this);
         repeatLabel.setText("重复次数:");
+        // 标签字体大小为屏幕宽度的3%
+        repeatLabel.setTextSize(screenWidth * 0.03f);
         LinearLayout.LayoutParams repeatLabelParams = new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
@@ -102,14 +119,15 @@ public class MainActivity extends AppCompatActivity {
         repeatCountEdit.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
         LinearLayout.LayoutParams repeatEditParams = new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+            buttonHeight
         );
-        repeatEditParams.setMargins(0, 0, 0, 10);
+        repeatEditParams.setMargins(0, 0, 0, margin);
         mainLayout.addView(repeatCountEdit, repeatEditParams);
         
         // 点击间隔
         TextView intervalLabel = new TextView(this);
         intervalLabel.setText("点击间隔(毫秒):");
+        intervalLabel.setTextSize(screenWidth * 0.03f);
         LinearLayout.LayoutParams intervalLabelParams = new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
@@ -121,9 +139,9 @@ public class MainActivity extends AppCompatActivity {
         intervalEdit.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
         LinearLayout.LayoutParams intervalEditParams = new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+            buttonHeight
         );
-        intervalEditParams.setMargins(0, 0, 0, 10);
+        intervalEditParams.setMargins(0, 0, 0, margin);
         mainLayout.addView(intervalEdit, intervalEditParams);
         
         // 开始按钮
@@ -131,9 +149,9 @@ public class MainActivity extends AppCompatActivity {
         startBtn.setText("开始自动点击");
         LinearLayout.LayoutParams startBtnParams = new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+            buttonHeight
         );
-        startBtnParams.setMargins(0, 0, 0, 5);
+        startBtnParams.setMargins(0, 0, 0, margin / 2);
         startBtn.setOnClickListener(v -> startAutoClick());
         mainLayout.addView(startBtn, startBtnParams);
         
@@ -142,9 +160,9 @@ public class MainActivity extends AppCompatActivity {
         stopBtn.setText("停止自动点击");
         LinearLayout.LayoutParams stopBtnParams = new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+            buttonHeight
         );
-        stopBtnParams.setMargins(0, 0, 0, 5);
+        stopBtnParams.setMargins(0, 0, 0, margin / 2);
         stopBtn.setOnClickListener(v -> stopAutoClick());
         mainLayout.addView(stopBtn, stopBtnParams);
         
@@ -153,9 +171,9 @@ public class MainActivity extends AppCompatActivity {
         settingsBtn.setText("打开辅助功能设置");
         LinearLayout.LayoutParams settingsBtnParams = new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+            buttonHeight
         );
-        settingsBtnParams.setMargins(0, 0, 0, 5);
+        settingsBtnParams.setMargins(0, 0, 0, margin / 2);
         settingsBtn.setOnClickListener(v -> openAccessibilitySettings());
         mainLayout.addView(settingsBtn, settingsBtnParams);
         
@@ -164,9 +182,9 @@ public class MainActivity extends AppCompatActivity {
         floatBtn.setText("显示悬浮窗");
         LinearLayout.LayoutParams floatBtnParams = new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+            buttonHeight
         );
-        floatBtnParams.setMargins(0, 0, 0, 5);
+        floatBtnParams.setMargins(0, 0, 0, margin / 2);
         floatBtn.setOnClickListener(v -> showFloatingWindow());
         mainLayout.addView(floatBtn, floatBtnParams);
         
@@ -175,9 +193,9 @@ public class MainActivity extends AppCompatActivity {
         scriptBtn.setText("打开脚本编辑器");
         LinearLayout.LayoutParams scriptBtnParams = new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+            buttonHeight
         );
-        scriptBtnParams.setMargins(0, 0, 0, 5);
+        scriptBtnParams.setMargins(0, 0, 0, margin / 2);
         scriptBtn.setOnClickListener(v -> openScriptEditor());
         mainLayout.addView(scriptBtn, scriptBtnParams);
         
@@ -187,43 +205,70 @@ public class MainActivity extends AppCompatActivity {
     private void addClickPoint() {
         pointCounter++;
         
+        // 获取屏幕尺寸
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;
+        int screenHeight = getResources().getDisplayMetrics().heightPixels;
+        
         LinearLayout pointLayout = new LinearLayout(this);
         pointLayout.setOrientation(LinearLayout.HORIZONTAL);
-        pointLayout.setPadding(10, 10, 10, 10);
+        // 设置padding为屏幕宽度的1%
+        int padding = (int) (screenWidth * 0.01);
+        pointLayout.setPadding(padding, padding, padding, padding);
         
         // X坐标
         TextView xLabel = new TextView(this);
         xLabel.setText("X:");
+        // 标签字体大小为屏幕宽度的2.5%
+        xLabel.setTextSize(screenWidth * 0.025f);
         pointLayout.addView(xLabel);
         
         EditText xEdit = new EditText(this);
         xEdit.setText("500");
-        xEdit.setWidth(100);
+        // X编辑框宽度为屏幕宽度的15%
+        int editWidth = (int) (screenWidth * 0.15);
+        xEdit.setWidth(editWidth);
         pointLayout.addView(xEdit);
         
         // Y坐标
         TextView yLabel = new TextView(this);
         yLabel.setText("Y:");
+        // 标签字体大小为屏幕宽度的2.5%
+        yLabel.setTextSize(screenWidth * 0.025f);
         pointLayout.addView(yLabel);
         
         EditText yEdit = new EditText(this);
         yEdit.setText("500");
-        yEdit.setWidth(100);
+        // Y编辑框宽度为屏幕宽度的15%
+        yEdit.setWidth(editWidth);
         pointLayout.addView(yEdit);
         
         // 描述
         TextView descLabel = new TextView(this);
         descLabel.setText("描述:");
+        // 标签字体大小为屏幕宽度的2.5%
+        descLabel.setTextSize(screenWidth * 0.025f);
         pointLayout.addView(descLabel);
         
         EditText descEdit = new EditText(this);
         descEdit.setText("点击点" + pointCounter);
-        descEdit.setWidth(200);
+        // 描述编辑框宽度为屏幕宽度的30%
+        int descWidth = (int) (screenWidth * 0.3);
+        descEdit.setWidth(descWidth);
         pointLayout.addView(descEdit);
         
         // 删除按钮
         Button deleteBtn = new Button(this);
         deleteBtn.setText("删除");
+        // 删除按钮宽度为屏幕宽度的12%
+        int deleteWidth = (int) (screenWidth * 0.12);
+        // 删除按钮高度为屏幕高度的4%
+        int deleteHeight = (int) (screenHeight * 0.04);
+        LinearLayout.LayoutParams deleteParams = new LinearLayout.LayoutParams(
+            deleteWidth,
+            deleteHeight
+        );
+        deleteParams.setMargins((int)(screenWidth * 0.01), 0, 0, 0);
+        deleteBtn.setLayoutParams(deleteParams);
         deleteBtn.setOnClickListener(v -> {
             clickPointsLayout.removeView(pointLayout);
             updateClickPointsList();
