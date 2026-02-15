@@ -53,6 +53,9 @@ public class MainActivity extends AppCompatActivity {
         int screenWidth = getResources().getDisplayMetrics().widthPixels;
         int screenHeight = getResources().getDisplayMetrics().heightPixels;
         
+        // 根布局 - 用于滚动整个内容
+        ScrollView rootScrollView = new ScrollView(this);
+        
         // 主布局
         LinearLayout mainLayout = new LinearLayout(this);
         mainLayout.setOrientation(LinearLayout.VERTICAL);
@@ -85,9 +88,31 @@ public class MainActivity extends AppCompatActivity {
         );
         // 边距为屏幕高度的0.5%
         int margin = (int) (screenHeight * 0.005);
-        addPointParams.setMargins(0, 0, 0, margin);
+        addPointParams.setMargins(0, 0, 0, margin / 2);
         addPointBtn.setOnClickListener(v -> addClickPoint());
         mainLayout.addView(addPointBtn, addPointParams);
+        
+        // 开始按钮
+        Button startBtn = new Button(this);
+        startBtn.setText("开始自动点击");
+        LinearLayout.LayoutParams startBtnParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            buttonHeight
+        );
+        startBtnParams.setMargins(0, 0, 0, margin / 2);
+        startBtn.setOnClickListener(v -> startAutoClick());
+        mainLayout.addView(startBtn, startBtnParams);
+        
+        // 停止按钮
+        Button stopBtn = new Button(this);
+        stopBtn.setText("停止自动点击");
+        LinearLayout.LayoutParams stopBtnParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            buttonHeight
+        );
+        stopBtnParams.setMargins(0, 0, 0, margin);
+        stopBtn.setOnClickListener(v -> stopAutoClick());
+        mainLayout.addView(stopBtn, stopBtnParams);
         
         // 点击点列表
         ScrollView scrollView = new ScrollView(this);
@@ -144,28 +169,6 @@ public class MainActivity extends AppCompatActivity {
         intervalEditParams.setMargins(0, 0, 0, margin);
         mainLayout.addView(intervalEdit, intervalEditParams);
         
-        // 开始按钮
-        Button startBtn = new Button(this);
-        startBtn.setText("开始自动点击");
-        LinearLayout.LayoutParams startBtnParams = new LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            buttonHeight
-        );
-        startBtnParams.setMargins(0, 0, 0, margin / 2);
-        startBtn.setOnClickListener(v -> startAutoClick());
-        mainLayout.addView(startBtn, startBtnParams);
-        
-        // 停止按钮
-        Button stopBtn = new Button(this);
-        stopBtn.setText("停止自动点击");
-        LinearLayout.LayoutParams stopBtnParams = new LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            buttonHeight
-        );
-        stopBtnParams.setMargins(0, 0, 0, margin / 2);
-        stopBtn.setOnClickListener(v -> stopAutoClick());
-        mainLayout.addView(stopBtn, stopBtnParams);
-        
         // 打开辅助功能设置
         Button settingsBtn = new Button(this);
         settingsBtn.setText("打开辅助功能设置");
@@ -195,11 +198,14 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout.LayoutParams.MATCH_PARENT,
             buttonHeight
         );
-        scriptBtnParams.setMargins(0, 0, 0, margin / 2);
+        scriptBtnParams.setMargins(0, 0, 0, margin);
         scriptBtn.setOnClickListener(v -> openScriptEditor());
         mainLayout.addView(scriptBtn, scriptBtnParams);
         
-        setContentView(mainLayout);
+        // 将主布局添加到根滚动视图
+        rootScrollView.addView(mainLayout);
+        
+        setContentView(rootScrollView);
     }
 
     private void addClickPoint() {
